@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAT Panel — Download</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#060610;--accent:#00d4ff;--accent-r:0,212,255;
+            --purple:#7c5cfc;--purple-r:124,92,252;
+            --text:#e0e0f0;--text2:#8888a8;--text3:#555575;
+            --border:rgba(255,255,255,0.055);
+            --card:rgba(12,12,28,0.82);
+            --radius:14px;
+        }
+        html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        .orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+        .orb-1{width:600px;height:600px;background:rgba(var(--accent-r),.06);top:-200px;right:-150px;animation:drift 22s ease-in-out infinite}
+        .orb-2{width:500px;height:500px;background:rgba(var(--purple-r),.05);bottom:-180px;left:-150px;animation:drift 28s ease-in-out infinite reverse}
+        @keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,30px)}66%{transform:translate(-30px,55px)}}
+
+        .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px;min-height:100vh;display:flex;flex-direction:column}
+
+        .hdr{display:flex;align-items:center;gap:12px;padding:16px 0;margin-bottom:40px}
+        .logo{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+        .hdr h1{font-size:16px;font-weight:700;letter-spacing:2.5px;color:var(--text2)}
+
+        .hero{text-align:center;padding:60px 0 70px}
+        .hero-title{font-size:clamp(42px,7vw,72px);font-weight:900;letter-spacing:4px;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-sub{font-size:17px;color:var(--text2);margin-top:18px;line-height:1.6}
+        .dl-btn{
+            display:inline-flex;align-items:center;gap:10px;
+            margin-top:36px;padding:18px 44px;
+            background:linear-gradient(135deg,var(--accent),var(--purple));
+            color:#fff;font-size:16px;font-weight:700;
+            letter-spacing:1.5px;text-transform:uppercase;
+            border:none;border-radius:var(--radius);
+            text-decoration:none;cursor:pointer;transition:all .25s;
+        }
+        .dl-btn:hover{box-shadow:0 6px 35px rgba(var(--accent-r),.35);transform:translateY(-2px)}
+        .dl-btn:active{transform:translateY(0)}
+
+        .sep{height:1px;background:var(--border);margin:0 auto;width:80%}
+
+        .steps{padding:60px 0}
+        .steps h2{text-align:center;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:36px}
+        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+        .step{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:30px 24px;text-align:center;transition:border-color .3s}
+        .step:hover{border-color:rgba(255,255,255,.12)}
+        .step-icon{font-size:32px;margin-bottom:14px}
+        .step-n{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:8px}
+        .step-t{font-size:16px;font-weight:600;margin-bottom:6px}
+        .step-d{font-size:13px;color:var(--text2);line-height:1.5}
+
+        .ftr{margin-top:auto;padding:24px 0;text-align:center;font-size:12px;color:var(--text3)}
+
+        @media(max-width:600px){.steps-grid{grid-template-columns:1fr}.hero{padding:40px 0 50px}}
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="page">
+        <header class="hdr">
+            <div class="logo">SP</div>
+            <h1>SCAT PANEL</h1>
+        </header>
+        <section class="hero">
+            <div class="hero-title">SCAT PANEL</div>
+            <p class="hero-sub">Next-generation aimbot engine.<br>Download. Run. Control from your browser.</p>
+            <a href="/download" class="dl-btn">⬇ DOWNLOAD v2.0</a>
+        </section>
+        <div class="sep"></div>
+        <section class="steps">
+            <h2>How It Works</h2>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-icon">📥</div>
+                    <div class="step-n">STEP 01</div>
+                    <div class="step-t">Download</div>
+                    <div class="step-d">Click the button above to download SCAT Panel</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">▶️</div>
+                    <div class="step-n">STEP 02</div>
+                    <div class="step-t">Execute</div>
+                    <div class="step-d">Run the app — it requests admin automatically</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-n">STEP 03</div>
+                    <div class="step-t">Control</div>
+                    <div class="step-d">Your panel opens in the browser — inject from there</div>
+                </div>
+            </div>
+        </section>
+        <footer class="ftr">SCAT Panel v2.0</footer>
+    </div>
+</body>
+</html>

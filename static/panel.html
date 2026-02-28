@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAT Panel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#060610;--bg-card:rgba(12,12,28,0.82);--bg-input:rgba(255,255,255,0.035);
+            --border:rgba(255,255,255,0.055);--border-h:rgba(255,255,255,0.12);
+            --accent:#00d4ff;--accent-r:0,212,255;
+            --purple:#7c5cfc;--purple-r:124,92,252;
+            --success:#00e676;--success-r:0,230,118;
+            --warn:#ffa726;--error:#ef5350;
+            --text:#e0e0f0;--text2:#8888a8;--text3:#555575;
+            --radius:14px;--radius-sm:10px;
+            --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Consolas',monospace;
+        }
+        html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:3px}
+
+        .orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+        .orb-1{width:550px;height:550px;background:rgba(var(--accent-r),.055);top:-180px;right:-120px;animation:drift 22s ease-in-out infinite}
+        .orb-2{width:450px;height:450px;background:rgba(var(--purple-r),.045);bottom:-140px;left:-120px;animation:drift 28s ease-in-out infinite reverse}
+        @keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(35px,25px)}66%{transform:translate(-25px,50px)}}
+
+        .app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;max-width:1300px;margin:0 auto;padding:22px}
+
+        /* offline banner */
+        .offline-bar{display:none;align-items:center;justify-content:center;gap:8px;padding:12px 16px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.25);border-radius:var(--radius-sm);margin-bottom:14px;font-size:13px;font-weight:500;color:var(--error);animation:pulse 2s ease-in-out infinite}
+        .offline-bar a{color:var(--accent);text-decoration:underline;font-weight:600}
+        .offline-bar.show{display:flex}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+        /* header */
+        .header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--bg-card);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px}
+        .brand{display:flex;align-items:center;gap:14px}
+        .logo{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+        .brand h1{font-size:17px;font-weight:700;letter-spacing:2.5px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .brand p{font-size:11px;color:var(--text2);margin-top:1px}
+        .badge{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text3);transition:all .35s}
+        .badge.online{color:var(--accent);border-color:rgba(var(--accent-r),.22);background:rgba(var(--accent-r),.06)}
+        .badge.connected{color:var(--success);border-color:rgba(var(--success-r),.22);background:rgba(var(--success-r),.06)}
+        .hdr-right{display:flex;align-items:center;gap:12px}
+        .dl-link{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:.5px;transition:all .2s}
+        .dl-link:hover{box-shadow:0 2px 16px rgba(var(--accent-r),.3);transform:translateY(-1px)}
+        .dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all .35s}
+        .badge.online .dot{background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-r),.55)}
+        .badge.connected .dot{background:var(--success);box-shadow:0 0 8px rgba(var(--success-r),.55);animation:blink 2s ease-in-out infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+        /* stats */
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+        .stat{background:var(--bg-card);backdrop-filter:blur(24px);border:1px solid var(--border);border-left:2px solid var(--border);border-radius:var(--radius-sm);padding:15px 18px;transition:border-color .3s}
+        .stat:nth-child(1){border-left-color:var(--accent)}.stat:nth-child(2){border-left-color:var(--purple)}.stat:nth-child(3){border-left-color:var(--success)}.stat:nth-child(4){border-left-color:var(--warn)}
+        .stat:hover{border-color:var(--border-h)}
+        .stat-l{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:600;margin-bottom:5px}
+        .stat-v{font-size:21px;font-weight:700;font-family:var(--mono);color:var(--text)}
+
+        /* grid */
+        .dash{display:grid;grid-template-columns:370px 1fr;gap:18px;flex:1;min-height:0}
+        .panel{background:var(--bg-card);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+        .panel-h{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)}
+        .panel-h h2{font-size:12px;font-weight:600;letter-spacing:.8px;color:var(--text2);text-transform:uppercase}
+        .panel-b{padding:22px;display:flex;flex-direction:column;gap:14px}
+
+        /* form */
+        .fg label{display:block;font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+        input[type="text"]{width:100%;padding:10px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:all .2s}
+        input[type="text"]:focus{border-color:rgba(var(--accent-r),.4);box-shadow:0 0 0 3px rgba(var(--accent-r),.07)}
+
+        /* buttons */
+        .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border:none;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+        .btn:disabled{opacity:.35;cursor:not-allowed}
+        .btn-p{background:rgba(var(--accent-r),.11);color:var(--accent);border:1px solid rgba(var(--accent-r),.2)}
+        .btn-p:hover:not(:disabled){background:rgba(var(--accent-r),.2);box-shadow:0 0 18px rgba(var(--accent-r),.08)}
+        .btn-d{background:rgba(239,83,80,.11);color:var(--error);border:1px solid rgba(239,83,80,.2)}
+        .btn-d:hover:not(:disabled){background:rgba(239,83,80,.2)}
+        .btn-main{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:14px;padding:15px 24px;border:none;text-transform:uppercase;letter-spacing:1.2px;position:relative;overflow:hidden}
+        .btn-main:hover:not(:disabled){box-shadow:0 4px 28px rgba(var(--accent-r),.28);transform:translateY(-1px)}
+        .btn-main:active:not(:disabled){transform:translateY(0)}
+        .btn-main.scanning{background:linear-gradient(135deg,var(--warn),#ff6d00);animation:blink 1.2s ease-in-out infinite}
+        .btn-s{background:rgba(255,255,255,.045);color:var(--text2);border:1px solid var(--border)}
+        .btn-s:hover:not(:disabled){background:rgba(255,255,255,.08);color:var(--text)}
+
+        /* toggle */
+        .trow{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+        .trow span{font-size:13px;color:var(--text2);font-weight:500}
+        .tgl{position:relative;width:44px;height:24px;flex-shrink:0}
+        .tgl input{opacity:0;width:0;height:0}
+        .tgl-s{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.07);border-radius:12px;transition:.3s}
+        .tgl-s::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--text3);border-radius:50%;transition:.3s}
+        .tgl input:checked+.tgl-s{background:rgba(var(--accent-r),.3)}
+        .tgl input:checked+.tgl-s::before{background:var(--accent);transform:translateX(20px)}
+        .tgl input:disabled+.tgl-s{opacity:.3;cursor:not-allowed}
+
+        .divider{height:1px;background:var(--border);margin:2px 0}
+        .sec-t{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:600}
+        .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+        /* console */
+        .console-wrap{flex:1;min-height:0;display:flex;flex-direction:column}
+        .console{flex:1;overflow-y:auto;padding:14px 18px;font-family:var(--mono);font-size:12px;line-height:1.75;min-height:340px;max-height:calc(100vh - 320px)}
+        .le{padding:2px 0;display:flex;gap:10px;animation:fadeUp .2s ease;border-bottom:1px solid rgba(255,255,255,.015)}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+        .le-t{color:var(--text3);flex-shrink:0;user-select:none}.le-m{word-break:break-word}
+        .le.info .le-m{color:var(--accent)}.le.success .le-m{color:var(--success)}.le.warning .le-m{color:var(--warn)}.le.error .le-m{color:var(--error)}
+        .clr-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:3px 7px;border-radius:6px;transition:.2s}
+        .clr-btn:hover{background:rgba(255,255,255,.05);color:var(--text)}
+
+        .footer{display:flex;justify-content:space-between;padding:14px 0;margin-top:18px;font-size:11px;color:var(--text3)}
+
+        @media(max-width:960px){.stats{grid-template-columns:repeat(2,1fr)}.dash{grid-template-columns:1fr}}
+        @media(max-width:500px){.app{padding:12px}.header{flex-direction:column;gap:10px;text-align:center}.stats{grid-template-columns:1fr 1fr}}
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="app">
+        <!-- Offline banner -->
+        <div class="offline-bar show" id="offBar">⚠ Client offline — <a href="/download">Download SCAT Panel.exe</a> and run it to connect</div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="logo">SP</div>
+                <div>
+                    <h1>SCAT PANEL</h1>
+                    <p>Engine v2.0</p>
+                </div>
+            </div>
+            <div class="hdr-right">
+                <a href="/download" class="dl-link">⬇ Download App</a>
+                <div class="badge" id="badge">
+                    <span class="dot"></span>
+                    <span id="badgeTxt">Client Offline</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat"><div class="stat-l">Process</div><div class="stat-v" id="sProc">—</div></div>
+            <div class="stat"><div class="stat-l">PID</div><div class="stat-v" id="sPid">—</div></div>
+            <div class="stat"><div class="stat-l">Entities</div><div class="stat-v" id="sEnt">0</div></div>
+            <div class="stat"><div class="stat-l">Injections</div><div class="stat-v" id="sInj">0</div></div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dash">
+            <div class="panel">
+                <div class="panel-h"><h2>Control Center</h2></div>
+                <div class="panel-b">
+                    <div class="fg">
+                        <label>Process Name</label>
+                        <input type="text" id="procIn" value="HD-Player" placeholder="e.g. HD-Player" spellcheck="false">
+                    </div>
+                    <button class="btn btn-p" id="connBtn" disabled><span>⚡</span> Connect</button>
+                    <div class="divider"></div>
+                    <button class="btn btn-main" id="injBtn" disabled>🎯 INJECT AIMBOT</button>
+                    <div class="trow">
+                        <span>Auto-Inject (2.5s)</span>
+                        <label class="tgl"><input type="checkbox" id="autoTgl" disabled><span class="tgl-s"></span></label>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="sec-t">Configuration</div>
+                    <div class="frow">
+                        <div class="fg"><label>Target Offset</label><input type="text" id="tOff" value="0x80" spellcheck="false"></div>
+                        <div class="fg"><label>Write Offset</label><input type="text" id="wOff" value="0x7C" spellcheck="false"></div>
+                    </div>
+                    <button class="btn btn-s" id="cfgBtn" disabled>Update Config</button>
+                </div>
+            </div>
+            <div class="panel console-wrap">
+                <div class="panel-h">
+                    <h2>Live Console</h2>
+                    <button class="clr-btn" id="clrBtn" title="Clear console">✕</button>
+                </div>
+                <div class="console" id="con"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <span>SCAT Panel v2.0</span>
+            <span id="footerId"></span>
+        </footer>
+    </div>
+
+    <script>
+    (function(){
+        const $ = id => document.getElementById(id);
+        const dom = {
+            offBar:  $('offBar'),
+            badge:   $('badge'),
+            badgeTxt:$('badgeTxt'),
+            procIn:  $('procIn'),
+            connBtn: $('connBtn'),
+            injBtn:  $('injBtn'),
+            autoTgl: $('autoTgl'),
+            tOff:    $('tOff'),
+            wOff:    $('wOff'),
+            cfgBtn:  $('cfgBtn'),
+            con:     $('con'),
+            clrBtn:  $('clrBtn'),
+            sProc:   $('sProc'),
+            sPid:    $('sPid'),
+            sEnt:    $('sEnt'),
+            sInj:    $('sInj'),
+            footerId:$('footerId'),
+        };
+
+        // Extract client_id from URL: /panel/{client_id}
+        const clientId = window.location.pathname.split('/').filter(Boolean).pop();
+        dom.footerId.textContent = 'ID: ' + clientId;
+
+        let ws = null;
+        let state = {};
+        let clientOnline = false;
+        let retries = 0;
+
+        // ── WebSocket ──────────────────────────
+        function connect() {
+            const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${proto}//${location.host}/ws/dash/${clientId}`);
+
+            ws.onopen = () => { retries = 0; };
+            ws.onclose = () => {
+                addLog('warning', 'Server connection lost — reconnecting...');
+                const delay = Math.min(1000 * Math.pow(1.5, retries), 10000);
+                retries++;
+                setTimeout(connect, delay);
+            };
+            ws.onerror = () => {};
+            ws.onmessage = e => {
+                const d = JSON.parse(e.data);
+                if (d.type === 'client_online')       setClientOnline(true);
+                else if (d.type === 'client_offline')  setClientOnline(false);
+                else if (d.type === 'status')          updateUI(d);
+                else if (d.type === 'log')             addLog(d.level, d.message);
+            };
+        }
+
+        function send(obj) {
+            if (ws && ws.readyState === 1) ws.send(JSON.stringify(obj));
+        }
+
+        // ── Client online/offline ──────────────
+        function setClientOnline(on) {
+            clientOnline = on;
+            dom.offBar.className = 'offline-bar' + (on ? '' : ' show');
+
+            if (!on) {
+                dom.badge.className = 'badge';
+                dom.badgeTxt.textContent = 'Client Offline';
+                dom.connBtn.disabled = true;
+                dom.injBtn.disabled = true;
+                dom.autoTgl.disabled = true;
+                dom.cfgBtn.disabled = true;
+                addLog('error', 'Client app went offline');
+            } else {
+                dom.badge.className = 'badge online';
+                dom.badgeTxt.textContent = 'Client Online';
+                dom.connBtn.disabled = false;
+                dom.cfgBtn.disabled = false;
+                addLog('success', 'Client app connected!');
+            }
+        }
+
+        // ── UI Update ──────────────────────────
+        function updateUI(s) {
+            state = s;
+            const gameOn = s.connected;
+
+            // If we got a status, client is online
+            if (!clientOnline) setClientOnline(true);
+
+            // Badge
+            if (gameOn) {
+                dom.badge.className = 'badge connected';
+                dom.badgeTxt.textContent = 'Game Connected';
+            } else {
+                dom.badge.className = 'badge online';
+                dom.badgeTxt.textContent = 'Client Online';
+            }
+
+            // Connect button
+            if (gameOn) {
+                dom.connBtn.className = 'btn btn-d';
+                dom.connBtn.innerHTML = '<span>⏏</span> Disconnect';
+                dom.connBtn.disabled = false;
+            } else {
+                dom.connBtn.className = 'btn btn-p';
+                dom.connBtn.innerHTML = '<span>⚡</span> Connect';
+                dom.connBtn.disabled = !clientOnline;
+            }
+
+            // Controls
+            dom.injBtn.disabled = !gameOn || s.scanning;
+            dom.autoTgl.disabled = !gameOn;
+            dom.autoTgl.checked = s.auto_inject;
+            dom.cfgBtn.disabled = !clientOnline;
+
+            // Inject button
+            if (s.scanning) {
+                dom.injBtn.textContent = '⏳ SCANNING...';
+                dom.injBtn.classList.add('scanning');
+            } else {
+                dom.injBtn.textContent = '🎯 INJECT AIMBOT';
+                dom.injBtn.classList.remove('scanning');
+            }
+
+            // Stats
+            dom.sProc.textContent = s.process || '—';
+            dom.sPid.textContent = s.pid || '—';
+            dom.sEnt.textContent = s.last_entities ?? 0;
+            dom.sInj.textContent = s.total_injections ?? 0;
+
+            if (s.target_offset) dom.tOff.value = s.target_offset;
+            if (s.write_offset) dom.wOff.value = s.write_offset;
+
+            document.title = gameOn
+                ? `SCAT Panel • ${s.process} (${s.pid})`
+                : 'SCAT Panel';
+        }
+
+        // ── Console ────────────────────────────
+        function addLog(level, msg) {
+            const t = new Date().toTimeString().slice(0, 8);
+            const el = document.createElement('div');
+            el.className = 'le ' + level;
+            const ts = document.createElement('span'); ts.className='le-t'; ts.textContent=t;
+            const ms = document.createElement('span'); ms.className='le-m'; ms.textContent=msg;
+            el.appendChild(ts); el.appendChild(ms);
+            dom.con.appendChild(el);
+            dom.con.scrollTop = dom.con.scrollHeight;
+            while (dom.con.children.length > 300) dom.con.removeChild(dom.con.firstChild);
+        }
+
+        // ── Events ─────────────────────────────
+        dom.connBtn.onclick = () => {
+            if (state.connected) send({action:'disconnect'});
+            else { const p=dom.procIn.value.trim(); if(p) send({action:'connect',process:p}); }
+        };
+        dom.injBtn.onclick = () => send({action:'inject'});
+        dom.autoTgl.onchange = () => send({action:'auto_inject',enabled:dom.autoTgl.checked});
+        dom.cfgBtn.onclick = () => send({action:'config',target_offset:dom.tOff.value.trim(),write_offset:dom.wOff.value.trim()});
+        dom.clrBtn.onclick = () => { dom.con.innerHTML=''; };
+        dom.procIn.addEventListener('keydown', e => { if(e.key==='Enter'&&!state.connected&&clientOnline) dom.connBtn.click(); });
+
+        // ── Init ───────────────────────────────
+        addLog('info', 'Waiting for client app...');
+        connect();
+    })();
+    </script>
+</body>
+</html>
