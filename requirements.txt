@@ -1,0 +1,7 @@
+# Server (host on VPS)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Client (compiled to .exe)
+psutil>=5.9.0
+websockets>=12.0
